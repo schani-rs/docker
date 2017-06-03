@@ -1,5 +1,20 @@
 version: '3'
 services:
+    import:
+        links:
+            - import_db
+        ports:
+            - "8104:8000"
+        environment:
+            - "ROCKET_PORT=8000"
+            - "ROCKET_ADDRESS=0.0.0.0"
+            - "DATABASE_URL=postgres://store:xkQBx7EVgr@userinfo_db/store"
+    import_db:
+        image: postgres
+        environment:
+            - "POSTGRES_USER=import"
+            - "POSTGRES_PASSWORD=xkQBx7EVgr"
+            - "POSTGRES_DB=import"
     processor:
         links:
             - 0processing_amqp

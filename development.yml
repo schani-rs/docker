@@ -1,5 +1,8 @@
 version: '3'
 services:
+    import:
+        build:
+            context: ../schani_import
     processor:
         build:
             context: ../schani_processor
