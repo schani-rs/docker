@@ -3,6 +3,7 @@ services:
     import:
         links:
             - import_db
+            - processing_amqp
         ports:
             - "8104:8000"
         environment:
@@ -17,7 +18,7 @@ services:
             - "POSTGRES_DB=import"
     processor:
         links:
-            - 0processing_amqp
+            - processing_amqp
     processing_amqp:
         image: rabbitmq
     store:
