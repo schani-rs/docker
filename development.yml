@@ -1,0 +1,5 @@
+version: '3'
+services:
+    userinfo:
+        build:
+            context: ../schani_userinfo

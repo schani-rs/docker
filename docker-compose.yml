@@ -1,0 +1,17 @@
+version: '3'
+services:
+    userinfo:
+        links:
+            - userinfo_db
+        ports:
+            - "8000:8000"
+        environment:
+            - "ROCKET_PORT=8000"
+            - "ROCKET_ADDRESS=0.0.0.0"
+            - "DATABASE_URL=postgres://userinfo:fTAqg9Hxmo@userinfo_db/userinfo"
+    userinfo_db:
+        image: postgres
+        environment:
+            - "POSTGRES_USER=userinfo"
+            - "POSTGRES_PASSWORD=fTAqg9Hxmo"
+            - "POSTGRES_DB=userinfo"
