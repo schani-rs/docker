@@ -8,17 +8,24 @@ services:
             - "ROCKET_PORT=8000"
             - "ROCKET_ADDRESS=0.0.0.0"
             - "DATABASE_URL=postgres://import:xkQBx7EVgr@userinfo_db/import"
+            - "AMQP_ADDRESS=processing_amqp:5672"
     import_db:
         image: postgres
         environment:
             - "POSTGRES_USER=import"
             - "POSTGRES_PASSWORD=xkQBx7EVgr"
             - "POSTGRES_DB=import"
+        volumes:
+            - ./data/import_db:/var/lib/postgresql/data
     processor:
         links:
             - processing_amqp
+        environment:
+            - "AMQP_ADDRESS=processing_amqp:5672"
     processing_amqp:
         image: rabbitmq
+        volumes:
+            - ./data/processing_amqp:/var/lib/rabbitmq
     store:
         links:
             - store_db
@@ -32,6 +39,8 @@ services:
             - "POSTGRES_USER=store"
             - "POSTGRES_PASSWORD=HchqJkF2Qe"
             - "POSTGRES_DB=store"
+        volumes:
+            - ./data/store_db:/var/lib/postgresql/data
     uploader:
         environment:
             - "ROCKET_PORT=8000"
@@ -49,3 +58,5 @@ services:
             - "POSTGRES_USER=userinfo"
             - "POSTGRES_PASSWORD=fTAqg9Hxmo"
             - "POSTGRES_DB=userinfo"
+        volumes:
+            - ./data/userinfo_db:/var/lib/postgresql/data
