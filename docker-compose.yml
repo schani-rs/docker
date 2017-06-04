@@ -4,8 +4,6 @@ services:
         links:
             - import_db
             - processing_amqp
-        ports:
-            - "8104:8000"
         environment:
             - "ROCKET_PORT=8000"
             - "ROCKET_ADDRESS=0.0.0.0"
@@ -24,8 +22,6 @@ services:
     store:
         links:
             - store_db
-        ports:
-            - "8105:8000"
         environment:
             - "ROCKET_PORT=8000"
             - "ROCKET_ADDRESS=0.0.0.0"
@@ -37,16 +33,12 @@ services:
             - "POSTGRES_PASSWORD=HchqJkF2Qe"
             - "POSTGRES_DB=store"
     uploader:
-        ports:
-            - "8106:8000"
         environment:
             - "ROCKET_PORT=8000"
             - "ROCKET_ADDRESS=0.0.0.0"
     userinfo:
         links:
             - userinfo_db
-        ports:
-            - "8107:8000"
         environment:
             - "ROCKET_PORT=8000"
             - "ROCKET_ADDRESS=0.0.0.0"
