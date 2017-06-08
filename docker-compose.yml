@@ -7,8 +7,15 @@ services:
         environment:
             - "ROCKET_PORT=8000"
             - "ROCKET_ADDRESS=0.0.0.0"
-            - "DATABASE_URL=postgres://import:xkQBx7EVgr@userinfo_db/import"
+            - "DATABASE_URL=postgres://import:xkQBx7EVgr@import_db/import"
             - "AMQP_ADDRESS=processing_amqp:5672"
+    import_migration:
+        image: christophwurst/diesel-cli
+        links:
+            - import_db
+        environment:
+            - "DATABASE_URL=postgres://import:xkQBx7EVgr@import_db/import"
+        command: ["bash", "-c", "cd /schani_import && diesel migration run"]
     import_db:
         image: postgres
         environment:
@@ -32,7 +39,14 @@ services:
         environment:
             - "ROCKET_PORT=8000"
             - "ROCKET_ADDRESS=0.0.0.0"
-            - "DATABASE_URL=postgres://store:HchqJkF2Qe@userinfo_db/store"
+            - "DATABASE_URL=postgres://store:HchqJkF2Qe@store_db/store"
+    store_migration:
+        image: christophwurst/diesel-cli
+        links:
+            - store_db
+        environment:
+            - "DATABASE_URL=postgres://store:HchqJkF2Qe@store_db/store"
+        command: ["bash", "-c", "cd /schani_store && diesel migration run"]
     store_db:
         image: postgres
         environment:
@@ -52,6 +66,13 @@ services:
             - "ROCKET_PORT=8000"
             - "ROCKET_ADDRESS=0.0.0.0"
             - "DATABASE_URL=postgres://userinfo:fTAqg9Hxmo@userinfo_db/userinfo"
+    userinfo_migration:
+        image: christophwurst/diesel-cli
+        links:
+            - userinfo_db
+        environment:
+            - "DATABASE_URL=postgres://userinfo:fTAqg9Hxmo@userinfo_db/userinfo"
+        command: ["bash", "-c", "cd /schani_userinfo && diesel migration run"]
     userinfo_db:
         image: postgres
         environment:
