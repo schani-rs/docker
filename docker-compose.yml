@@ -21,7 +21,7 @@ services:
         links:
             - processing_amqp
         environment:
-            - "AMQP_ADDRESS=processing_amqp:5672"
+            - "AMQP_ADDRESS=processing_amqp"
     processing_amqp:
         image: rabbitmq
         volumes:
