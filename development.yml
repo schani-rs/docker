@@ -8,6 +8,9 @@ services:
             - "8100:8000"
         volumes:
             - ../schani_import/target/debug:/schani_import
+    import_migration:
+        volumes:
+            - ../schani_import:/schani_import
     processor:
         build:
             context: ../schani_processor
@@ -21,6 +24,9 @@ services:
             context: ../schani_store
         ports:
             - "8102:8000"
+    store_migration:
+        volumes:
+            - ../schani_store:/schani_store
     uploader:
         build:
             context: ../schani_uploader
@@ -37,6 +43,9 @@ services:
             - "8104:8000"
         volumes:
             - ../schani_userinfo/target/debug:/schani_userinfo
+    userinfo_migration:
+        volumes:
+            - ../schani_userinfo:/schani_userinfo
     userinfo_db:
         ports:
             - "54323:5432"
