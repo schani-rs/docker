@@ -3,13 +3,19 @@ services:
     import:
         build:
             context: ../schani_import
+            dockerfile: Dockerfile.dev
         ports:
             - "8100:8000"
+        volumes:
+            - ../schani_import/target/debug:/schani_import
     processor:
         build:
             context: ../schani_processor
+            dockerfile: Dockerfile.dev
         ports:
             - "8101:8000"
+        volumes:
+            - ../schani_processor/target/debug:/schani_processor
     store:
         build:
             context: ../schani_store
@@ -18,8 +24,11 @@ services:
     uploader:
         build:
             context: ../schani_uploader
+            dockerfile: Dockerfile.dev
         ports:
             - "8103:8000"
+        volumes:
+            - ../schani_uploader/target/debug:/schani_uploader
     userinfo:
         build:
             context: ../schani_userinfo
