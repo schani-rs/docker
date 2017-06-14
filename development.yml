@@ -1,5 +1,13 @@
 version: '3'
 services:
+    auth:
+        build:
+            context: ../schani_auth
+            dockerfile: Dockerfile.dev
+        ports:
+            - "8105:8000"
+        volumes:
+            - ../schani_auth/target/debug:/schani_auth
     import:
         build:
             context: ../schani_import
