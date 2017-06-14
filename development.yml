@@ -30,8 +30,11 @@ services:
     store:
         build:
             context: ../schani_store
+            dockerfile: Dockerfile.dev
         ports:
             - "8102:8000"
+        volumes:
+            - ../schani_store/target/debug:/schani_store
     store_migration:
         volumes:
             - ../schani_store:/schani_store
