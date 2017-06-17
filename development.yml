@@ -16,6 +16,9 @@ services:
             - "8100:8000"
         volumes:
             - ../schani_import/target/debug:/schani_import
+    import_db:
+        ports:
+            - "54321:5432"
     import_migration:
         volumes:
             - ../schani_import:/schani_import
@@ -35,6 +38,12 @@ services:
             - "8102:8000"
         volumes:
             - ../schani_store/target/debug:/schani_store
+            - ./data/store_data:/schani_store_data
+        environment:
+            - "FILE_STORAGE_PATH=/schani_store_data"
+    store_db:
+        ports:
+            - "54324:5432"
     store_migration:
         volumes:
             - ../schani_store:/schani_store
