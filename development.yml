@@ -8,6 +8,17 @@ services:
             - "8105:8000"
         volumes:
             - ../schani_auth/target/debug:/schani_auth
+    image_recognition:
+        build:
+            context: ../schani_image_recognition
+            dockerfile: Dockerfile.dev
+        environment:
+            - "SCRIPT_LOCATION=/tensorflow_models/tutorials/image/imagenet"
+        ports:
+            - "8106:8000"
+        volumes:
+            - ../schani_image_recognition/tensorflow_models:/tensorflow_models
+            - ../schani_image_recognition/target/debug:/schani_image_recognition
     import:
         build:
             context: ../schani_import
@@ -30,6 +41,8 @@ services:
             - "8101:8000"
         volumes:
             - ../schani_processor/target/debug:/schani_processor
+        environment:
+            - "RUST_LOG=info"
     store:
         build:
             context: ../schani_store
