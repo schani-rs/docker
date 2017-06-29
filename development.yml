@@ -1,5 +1,13 @@
 version: '3'
 services:
+    apigateway:
+        build:
+            context: ../schani_apigateway
+            dockerfile: Dockerfile.dev
+        ports:
+            - "8107:8000"
+        volumes:
+            - ../schani_apigateway/target/debug:/schani_apigateway
     auth:
         build:
             context: ../schani_auth
@@ -83,3 +91,12 @@ services:
     userinfo_db:
         ports:
             - "54323:5432"
+    web:
+        build:
+            context: ../schani_web
+            dockerfile: Dockerfile.dev
+        ports:
+            - "8108:8000"
+        volumes:
+            - ../schani_web/target/debug:/schani_web
+            - ../schani_web/static:/static

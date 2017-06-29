@@ -1,5 +1,14 @@
 version: '3'
 services:
+    apigateway:
+        links:
+            - auth
+            - store
+        environment:
+            - "ROCKET_PORT=8000"
+            - "ROCKET_ADDRESS=0.0.0.0"
+            - "SCHANI_AUTH_URL=http://auth:8000"
+            - "SCHANI_STORE_URL=http://store:8000/api"
     auth:
         environment:
             - "ROCKET_PORT=8000"
@@ -89,3 +98,7 @@ services:
             - "POSTGRES_DB=userinfo"
         volumes:
             - ./data/userinfo_db:/var/lib/postgresql/data
+    web:
+        environment:
+            - "ROCKET_PORT=8000"
+            - "ROCKET_ADDRESS=0.0.0.0"
