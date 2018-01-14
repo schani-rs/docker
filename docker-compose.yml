@@ -1,104 +1,89 @@
 version: '3'
 services:
     apigateway:
+        image: schanirs/apigateway
+        ports:
+            - "8000:3000"
         links:
             - auth
+            - import
+            - library
             - store
-        environment:
-            - "ROCKET_PORT=8000"
-            - "ROCKET_ADDRESS=0.0.0.0"
-            - "SCHANI_AUTH_URL=http://auth:8000"
-            - "SCHANI_STORE_URL=http://store:8000/api"
+
     auth:
-        environment:
-            - "ROCKET_PORT=8000"
-            - "ROCKET_ADDRESS=0.0.0.0"
-    image_recognition:
-        environment:
-            - "ROCKET_PORT=8000"
-            - "ROCKET_ADDRESS=0.0.0.0"
+        image: schanirs/auth
+        ports:
+            - "8001:8000"
+
     import:
+        image: schanirs/import
+        environment:
+            - "AMQP_ADDRESS=processing_queue"
+            - "DATABASE_URL=postgres://import:BSStykoth4XneRoAguZx@import_db:5432/schani_import"
+        ports:
+            - "8002:8000"
         links:
             - import_db
-            - processing_amqp
-        environment:
-            - "ROCKET_PORT=8000"
-            - "ROCKET_ADDRESS=0.0.0.0"
-            - "DATABASE_URL=postgres://import:xkQBx7EVgr@import_db/import"
-            - "AMQP_ADDRESS=processing_amqp"
-    import_migration:
-        image: christophwurst/diesel-cli
-        links:
-            - import_db
-        environment:
-            - "DATABASE_URL=postgres://import:xkQBx7EVgr@import_db/import"
-        command: ["bash", "-c", "cd /schani_import && diesel migration run"]
+            - library
+            - processing_queue
+            - store
     import_db:
         image: postgres
         environment:
             - "POSTGRES_USER=import"
-            - "POSTGRES_PASSWORD=xkQBx7EVgr"
-            - "POSTGRES_DB=import"
+            - "POSTGRES_PASSWORD=BSStykoth4XneRoAguZx"
+            - "POSTGRES_DB=schani_import"
+
+    library:
+        image: schanirs/library
+        environment:
+            - "DATABASE_URL=postgres://library:474FZLnQsRvQ4uzsoJ2JpTTi3WeYA5BP@library_db:5432/schani_library"
+        ports:
+            - "8003:8000"
+        links:
+            - library_db
+    library_db:
+        image: postgres
+        environment:
+            - "POSTGRES_USER=library"
+            - "POSTGRES_PASSWORD=474FZLnQsRvQ4uzsoJ2JpTTi3WeYA5BP"
+            - "POSTGRES_DB=schani_library"
+
+    processing_queue:
+        image: rabbitmq:3-management
+        ports:
+            - "8100:15672" #mgmt
         volumes:
-            - ./data/import_db:/var/lib/postgresql/data
+            - processing_queue_storage:/var/lib/rabbitmq
     processor:
+        image: schanirs/processor
         links:
-            - processing_amqp
-        environment:
-            - "AMQP_ADDRESS=processing_amqp"
-    processing_amqp:
-        image: rabbitmq
-        volumes:
-            - ./data/processing_amqp:/var/lib/rabbitmq
+            - library
+            - processing_queue
+            - store
+
     store:
-        links:
-            - store_db
+        image: schanirs/store
         environment:
-            - "ROCKET_PORT=8000"
             - "ROCKET_ADDRESS=0.0.0.0"
-            - "DATABASE_URL=postgres://store:HchqJkF2Qe@store_db/store"
-    store_migration:
-        image: christophwurst/diesel-cli
+            - "STORAGE_HOST=http://store_s3:9000"
+            - "MINIO_ACCESS_KEY=CMDBEHZNRIW1UA6AQ80W"
+            - "MINIO_SECRET_KEY=9Wh/pknTtRVTzwyBo3HCdCXVYusegHWcBjT4g6cR"
+            - "AWS_ACCESS_KEY_ID=CMDBEHZNRIW1UA6AQ80W"
+            - "AWS_SECRET_ACCESS_KEY=9Wh/pknTtRVTzwyBo3HCdCXVYusegHWcBjT4g6cR"
+        ports:
+            - "8004:8000"
         links:
-            - store_db
+            - store_s3
+    store_s3:
+        image: minio/minio
         environment:
-            - "DATABASE_URL=postgres://store:HchqJkF2Qe@store_db/store"
-        command: ["bash", "-c", "cd /schani_store && diesel migration run"]
-    store_db:
-        image: postgres
-        environment:
-            - "POSTGRES_USER=store"
-            - "POSTGRES_PASSWORD=HchqJkF2Qe"
-            - "POSTGRES_DB=store"
+            - "MINIO_ACCESS_KEY=CMDBEHZNRIW1UA6AQ80W"
+            - "MINIO_SECRET_KEY=9Wh/pknTtRVTzwyBo3HCdCXVYusegHWcBjT4g6cR"
+        command: server /data
         volumes:
-            - ./data/store_db:/var/lib/postgresql/data
-    uploader:
-        environment:
-            - "ROCKET_PORT=8000"
-            - "ROCKET_ADDRESS=0.0.0.0"
-    userinfo:
-        links:
-            - userinfo_db
-        environment:
-            - "ROCKET_PORT=8000"
-            - "ROCKET_ADDRESS=0.0.0.0"
-            - "DATABASE_URL=postgres://userinfo:fTAqg9Hxmo@userinfo_db/userinfo"
-    userinfo_migration:
-        image: christophwurst/diesel-cli
-        links:
-            - userinfo_db
-        environment:
-            - "DATABASE_URL=postgres://userinfo:fTAqg9Hxmo@userinfo_db/userinfo"
-        command: ["bash", "-c", "cd /schani_userinfo && diesel migration run"]
-    userinfo_db:
-        image: postgres
-        environment:
-            - "POSTGRES_USER=userinfo"
-            - "POSTGRES_PASSWORD=fTAqg9Hxmo"
-            - "POSTGRES_DB=userinfo"
-        volumes:
-            - ./data/userinfo_db:/var/lib/postgresql/data
-    web:
-        environment:
-            - "ROCKET_PORT=8000"
-            - "ROCKET_ADDRESS=0.0.0.0"
+            - store_storage:/data
+
+volumes:
+    processing_queue_storage:
+    store_storage:
