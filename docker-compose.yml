@@ -19,6 +19,8 @@ services:
         image: schanirs/import
         environment:
             - "AMQP_ADDRESS=processing_queue"
+            - "LIBRARY_URL=http://library:8000"
+            - "STORE_URL=http://store:8000"
             - "DATABASE_URL=postgres://import:BSStykoth4XneRoAguZx@import_db:5432/schani_import"
         ports:
             - "8002:8000"
@@ -57,6 +59,10 @@ services:
             - processing_queue_storage:/var/lib/rabbitmq
     processor:
         image: schanirs/processor
+        environment:
+            - "AMQP_ADDRESS=processing_queue"
+            - "LIBRARY=http://library:8000"
+            - "STORE=http://store:8000"
         links:
             - library
             - processing_queue
